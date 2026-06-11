@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Craft App Builder - Criar Apps Profissionais</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* PAINEL ESQUERDO - CONFIGURAÇÃO */
+        .config-panel {
+            grid-column: 1;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-header::before {
+            content: '⚙️';
+            font-size: 24px;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .color-picker-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .color-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-input input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .color-input input[type="text"] {
+            flex: 1;
+            padding: 8px;
+        }
+
+        /* PAINEL CENTRAL - PREVIEW */
+        .preview-panel {
+            grid-column: 2;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+
+        .preview-panel .panel-header::before {
+            content: '📱';
+        }
+
+        .preview-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .phone-frame {
+            width: 320px;
+            height: 640px;
+            background: #000;
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 25px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .phone-screen {
+            flex: 1;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-top: 5px;
+        }
+
+        .screen-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .screen-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .screen-button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .screen-button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .screen-button:active {
+            transform: scale(0.98);
+        }
+
+        .screen-description {
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        /* PAINEL DIREITO - EXPORTAÇÃO E FUNÇÕES */
+        .export-panel {
+            grid-column: 3;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .export-panel .panel-header::before {
+            content: '📦';
+        }
+
+        .export-panel .panel-header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(17, 153, 142, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.8);
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .info-box.success {
+            border-left-color: #11998e;
+            background: rgba(17, 153, 142, 0.1);
+        }
+
+        .info-box.warning {
+            border-left-color: #f5576c;
+            background: rgba(245, 87, 108, 0.1);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-body {
+            margin-bottom: 25px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .close-btn {
+            background: #eee;
+            color: #333;
+        }
+
+        .close-btn:hover {
+            background: #ddd;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .panel-content {
+            scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.05);
+            scrollbar-width: thin;
+        }
+
+        /* RESPONSIVO */
+        @media (max-width: 1400px) {
+            .container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .config-panel,
+            .preview-panel,
+            .export-panel {
+                grid-column: 1;
+            }
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #11998e;
+            font-weight: bold;
+        }
+
+        .input-hint {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.1);
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- PAINEL ESQUERDO - CONFIGURAÇÃO -->
+        <div class="panel config-panel scrollbar">
+            <div class="panel-header">Configurações do App</div>
+            <div class="panel-content scrollbar">
+                <!-- Nome do App -->
+                <div class="form-group">
+                    <label for="appName">Nome do App *</label>
+                    <input type="text" id="appName" placeholder="Ex: Meu App Incrível" value="Meu App">
+                    <div class="input-hint">O nome que será exibido no celular</div>
+                </div>
+
+                <!-- Descrição -->
+                <div class="form-group">
+                    <label for="appDesc">Descrição *</label>
+                    <textarea id="appDesc" placeholder="Descreva o propósito do seu app">App criado com Craft Builder</textarea>
+                    <div class="input-hint">Breve descrição do funcionamento</div>
+                </div>
+
+                <!-- Versão -->
+                <div class="form-group">
+                    <label for="appVersion">Versão</label>
+                    <input type="text" id="appVersion" placeholder="1.0.0" value="1.0.0">
+                    <div class="input-hint">Versão do aplicativo</div>
+                </div>
+
+                <!-- Package Name -->
+                <div class="form-group">
+                    <label for="packageName">Package Name *</label>
+                    <input type="text" id="packageName" placeholder="com.exemplo.meuapp" value="com.craft.app">
+                    <div class="input-hint">Identificador único (com.empresa.app)</div>
+                </div>
+
+                <!-- Cores -->
+                <div class="form-group">
+                    <label>Cores Principais</label>
+                    <div class="color-picker-group">
+                        <div class="color-input">
+                            <label for="primaryColor">Primária</label>
+                            <input type="color" id="primaryColor" value="#667eea">
+                        </div>
+                        <div class="color-input">
+                            <label for="secondaryColor">Secundária</label>
+                            <input type="color" id="secondaryColor" value="#764ba2">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tipo de App -->
+                <div class="form-group">
+                    <label for="appType">Tipo de App</label>
+                    <select id="appType">
+                        <option value="util">Utilitário</option>
+                        <option value="social">Social</option>
+                        <option value="games">Jogos</option>
+                        <option value="produtividade">Produtividade</option>
+                        <option value="ecommerce">E-commerce</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+
+                <!-- Permissões -->
+                <div class="form-group">
+                    <label>Permissões Necessárias</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 500;">
+                            <input type="checkbox" id="perm-internet" checked> Internet
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 500;">
+                            <input type="checkbox" id="perm-camera"> Câmera
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 500;">
+                            <input type="checkbox" id="perm-location"> Localização
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 500;">
+                            <input type="checkbox" id="perm-storage"> Armazenamento
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 500;">
+                            <input type="checkbox" id="perm-contacts"> Contatos
+                        </label>
+                    </div>
+                    <div class="input-hint">Selecione as permissões que o app precisa</div>
+                </div>
+
+                <!-- Desenvolvedora -->
+                <div class="form-group">
+                    <label for="developer">Nome da Desenvolvedora</label>
+                    <input type="text" id="developer" placeholder="Seu Nome ou Empresa" value="Craft Developer">
+                </div>
+
+                <!-- Website -->
+                <div class="form-group">
+                    <label for="website">Website/URL</label>
+                    <input type="url" id="website" placeholder="https://seu-site.com">
+                </div>
+
+                <!-- Botão de Atualizar Preview -->
+                <button class="btn btn-primary" style="width: 100%;" onclick="atualizarPreview()">
+                    ✨ Atualizar Preview
+                </button>
+            </div>
+        </div>
+
+        <!-- PAINEL CENTRAL - PREVIEW -->
+        <div class="panel preview-panel">
+            <div class="panel-header" id="previewHeader">Seu App</div>
+            <div class="preview-container">
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="screen-header" id="screenHeader" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <span id="screenTitle">Meu App</span>
+                        </div>
+                        <div class="screen-content" id="screenContent">
+                            <div class="screen-description" id="screenDesc">App criado com Craft Builder</div>
+                            <button class="screen-button" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                Botão Principal
+                            </button>
+                            <button class="screen-button" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                                Ação Secundária
+                            </button>
+                            <button class="screen-button" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                Mais Opções
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAINEL DIREITO - EXPORTAÇÃO -->
+        <div class="panel export-panel scrollbar">
+            <div class="panel-header">Build & Exportação</div>
+            <div class="panel-content scrollbar">
+                <!-- SEÇÃO: ESTATÍSTICAS -->
+                <div class="section">
+                    <div class="section-title">📊 Estatísticas do Projeto</div>
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="appSizeValue">2.4</div>
+                            <div class="stat-label">Tamanho (MB)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="permCount">5</div>
+                            <div class="stat-label">Permissões</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO: EXPORTAÇÃO APK -->
+                <div class="section">
+                    <div class="section-title">📱 Exportar APK</div>
+                    <div class="button-group">
+                        <button class="btn btn-success" onclick="gerarAPK()">
+                            🚀 Gerar APK (Release)
+                        </button>
+                        <button class="btn btn-warning" onclick="gerarAPKDebug()">
+                            🐛 Gerar APK (Debug)
+                        </button>
+                    </div>
+                    <div class="info-box success" style="margin-top: 12px;">
+                        APK otimizado para produção. Pronto para publicação na Play Store.
+                    </div>
+                </div>
+
+                <!-- SEÇÃO: CONFIGURAÇÕES AVANÇADAS -->
+                <div class="section">
+                    <div class="section-title">⚡ Build Avançado</div>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="buildOptimizado()">
+                            ⚙️ Build Otimizado
+                        </button>
+                        <button class="btn btn-primary" onclick="gerarProGuard()">
+                            🔒 ProGuard (Proteção)
+                        </button>
+                        <button class="btn btn-primary" onclick="testarApp()">
+                            🧪 Testar App (Emulador)
+                        </button>
+                    </div>
+                    <div class="info-box warning" style="margin-top: 12px;">
+                        Requer Android SDK e emulador configurado
+                    </div>
+                </div>
+
+                <!-- SEÇÃO: CÓDIGO E CONFIGURAÇÃO -->
+                <div class="section">
+                    <div class="section-title">💻 Código Gerado</div>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="verManifestAndroidXml()">
+                            📄 AndroidManifest.xml
+                        </button>
+                        <button class="btn btn-primary" onclick="verBuildGradle()">
+                            📄 build.gradle
+                        </button>
+                        <button class="btn btn-primary" onclick="verMainActivity()">
+                            📄 MainActivity.java
+                        </button>
+                        <button class="btn btn-primary" onclick="downloadProjeto()">
+                            📥 Download Projeto Completo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO: TESTES -->
+                <div class="section">
+                    <div class="section-title">🧬 Testes & Análise</div>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="executarTestes()">
+                            ✅ Executar Testes Unitários
+                        </button>
+                        <button class="btn btn-primary" onclick="analisarSeguranca()">
+                            🔐 Analisar Segurança
+                        </button>
+                        <button class="btn btn-primary" onclick="verificarPerformance()">
+                            ⚡ Verificar Performance
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO: DOCUMENTAÇÃO -->
+                <div class="section">
+                    <div class="section-title">📚 Recursos</div>
+                    <ul class="feature-list">
+                        <li>Interface Material Design 3</li>
+                        <li>Suporte Multi-idioma</li>
+                        <li>Dark Mode Automático</li>
+                        <li>Otimizado para Performance</li>
+                        <li>Pronto para Play Store</li>
+                    </ul>
+                </div>
+
+                <!-- SEÇÃO: SUPORTE -->
+                <div class="section">
+                    <div class="section-title">❓ Ajuda</div>
+                    <div class="button-group">
+                        <button class="btn close-btn" onclick="mostrarAjuda()">
+                            📖 Documentação
+                        </button>
+                        <button class="btn close-btn" onclick="mostrarSobre()">
+                            ℹ️ Sobre Craft App
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAIS -->
+    <!-- Modal: APK Gerado -->
+    <div class="modal" id="modalAPK">
+        <div class="modal-content">
+            <div class="modal-header">✅ APK Gerado com Sucesso!</div>
+            <div class="modal-body">
+                <div class="success-icon">📱</div>
+                <p id="apkMessage">Seu APK foi gerado e está pronto para download</p>
+                <div class="info-box success" style="margin-top: 15px;">
+                    <strong>Arquivo:</strong> <span id="apkFileName">app-release.apk</span><br>
+                    <strong>Tamanho:</strong> <span id="apkFileSize">2.4 MB</span><br>
+                    <strong>Status:</strong> Pronto para publicação
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn close-btn" onclick="fecharModal('modalAPK')">Fechar</button>
+                <button class="btn btn-success" onclick="downloadAPK()">⬇️ Download APK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Build em Progresso -->
+    <div class="modal" id="modalBuild">
+        <div class="modal-content">
+            <div class="modal-header">🔨 Compilando...</div>
+            <div class="modal-body">
+                <div style="text-align: center;">
+                    <div class="loading"></div>
+                    <p id="buildStatus">Processando seu projeto...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <div style="background: #f0f0f0; border-radius: 8px; overflow: hidden;">
+                        <div id="buildProgress" style="width: 30%; height: 8px; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.5s ease;"></div>
+                    </div>
+                    <div style="text-align: center; margin-top: 10px; font-size: 12px; color: #999;">
+                        <span id="buildPercent">30%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Código -->
+    <div class="modal" id="modalCodigo">
+        <div class="modal-content">
+            <div class="modal-header" id="codigoTitle">Código Gerado</div>
+            <div class="modal-body">
+                <textarea id="codigoContent" style="width: 100%; height: 300px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 12px;" readonly></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn close-btn" onclick="fecharModal('modalCodigo')">Fechar</button>
+                <button class="btn btn-primary" onclick="copiarCodigo()">📋 Copiar Código</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Ajuda -->
+    <div class="modal" id="modalAjuda">
+        <div class="modal-content">
+            <div class="modal-header">📖 Documentação</div>
+            <div class="modal-body">
+                <h3 style="margin-bottom: 10px; color: #667eea;">Como usar o Craft App Builder:</h3>
+                <ol style="line-height: 1.8; margin-left: 20px;">
+                    <li><strong>Configure seu app:</strong> Preencha as informações básicas no painel esquerdo</li>
+                    <li><strong>Visualize em tempo real:</strong> Veja as mudanças no preview central</li>
+                    <li><strong>Customize as cores:</strong> Escolha as cores primárias e secundárias</li>
+                    <li><strong>Selecione permissões:</strong> Defina as permissões que seu app precisará</li>
+                    <li><strong>Gere o APK:</strong> Clique em "Gerar APK" para criar o arquivo instalável</li>
+                    <li><strong>Teste:</strong> Use o emulador para testar antes de publicar</li>
+                    <li><strong>Publique:</strong> Suba para a Google Play Store</li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button class="btn close-btn" onclick="fecharModal('modalAjuda')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Sobre -->
+    <div class="modal" id="modalSobre">
+        <div class="modal-content">
+            <div class="modal-header">ℹ️ Sobre Craft App Builder</div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🎨</div>
+                    <h2 style="color: #667eea; margin-bottom: 5px;">Craft App Builder</h2>
+                    <p style="color: #999;">v1.0.0 - Build Beautiful Apps</p>
+                </div>
+                <div class="info-box success">
+                    <strong>Desenvolvido por:</strong> Craft Team<br>
+                    <strong>Tecnologia:</strong> HTML5, CSS3, JavaScript<br>
+                    <strong>Compatibilidade:</strong> Android 7.0+<br>
+                    <strong>Última atualização:</strong> 2024
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn close-btn" onclick="fecharModal('modalSobre')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // FUNÇÕES DE CONTROLE DA INTERFACE
+        // ============================================
+
+        function atualizarPreview() {
+            const appName = document.getElementById('appName').value || 'Meu App';
+            const appDesc = document.getElementById('appDesc').value || 'App criado com Craft Builder';
+            const primaryColor = document.getElementById('primaryColor').value;
+            const secondaryColor = document.getElementById('secondaryColor').value;
+
+            // Atualizar título na tela
+            document.getElementById('screenTitle').textContent = appName;
+            document.getElementById('previewHeader').textContent = appName;
+
+            // Atualizar descrição
+            document.getElementById('screenDesc').textContent = appDesc;
+
+            // Atualizar cores
+            document.getElementById('screenHeader').style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+
+            // Atualizar cores dos botões
+            const botoes = document.querySelectorAll('.screen-button');
+            botoes[0].style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+
+            // Atualizar estatísticas
+            atualizarEstatisticas();
+
+            // Mostrar notificação
+            mostrarNotificacao('Preview atualizado com sucesso! ✨');
+        }
+
+        function atualizarEstatisticas() {
+            const perms = document.querySelectorAll('input[id^="perm-"]:checked').length;
+            document.getElementById('permCount').textContent = perms;
+
+            // Tamanho varia baseado em permissões
+            const tamanho = (1.8 + perms * 0.3).toFixed(1);
+            document.getElementById('appSizeValue').textContent = tamanho;
+        }
+
+        function abrirModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function fecharModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function mostrarNotificacao(msg) {
+            console.log('✅', msg);
+        }
+
+        // ============================================
+        // FUNÇÕES DE EXPORTAÇÃO E BUILD
+        // ============================================
+
+        function gerarAPK() {
+            const appName = document.getElementById('appName').value || 'app';
+            abrirModal('modalBuild');
+
+            // Simular progresso
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 25;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+
+                    document.getElementById('buildProgress').style.width = '100%';
+                    document.getElementById('buildPercent').textContent = '100%';
+                    document.getElementById('buildStatus').textContent = '✅ APK gerado com sucesso!';
+
+                    setTimeout(() => {
+                        fecharModal('modalBuild');
+                        abrirModal('modalAPK');
+                        document.getElementById('apkFileName').textContent = `${appName}-release.apk`;
+                        document.getElementById('apkFileSize').textContent = document.getElementById('appSizeValue').textContent + ' MB';
+                    }, 1000);
+                } else {
+                    document.getElementById('buildProgress').style.width = progress + '%';
+                    document.getElementById('buildPercent').textContent = Math.floor(progress) + '%';
+                }
+            }, 500);
+        }
+
+        function gerarAPKDebug() {
+            const appName = document.getElementById('appName').value || 'app';
+            abrirModal('modalBuild');
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 30;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+
+                    document.getElementById('buildProgress').style.width = '100%';
+                    document.getElementById('buildPercent').textContent = '100%';
+                    document.getElementById('buildStatus').textContent = '✅ APK Debug gerado!';
+
+                    setTimeout(() => {
+                        fecharModal('modalBuild');
+                        abrirModal('modalAPK');
+                        document.getElementById('apkFileName').textContent = `${appName}-debug.apk`;
+                        document.getElementById('apkFileSize').textContent = (parseFloat(document.getElementById('appSizeValue').textContent) + 0.8).toFixed(1) + ' MB';
+                        document.getElementById('apkMessage').textContent = 'APK Debug foi gerado. Pronto para testes em emulador ou dispositivo físico.';
+                    }, 1000);
+                } else {
+                    document.getElementById('buildProgress').style.width = progress + '%';
+                    document.getElementById('buildPercent').textContent = Math.floor(progress) + '%';
+                }
+            }, 400);
+        }
+
+        function buildOptimizado() {
+            abrirModal('modalBuild');
+            document.getElementById('buildStatus').textContent = 'Compilando com otimizações...';
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+
+                    document.getElementById('buildProgress').style.width = '100%';
+                    document.getElementById('buildPercent').textContent = '100%';
+                    document.getElementById('buildStatus').textContent = '✅ Build otimizado concluído!';
+
+                    setTimeout(() => {
+                        fecharModal('modalBuild');
+                        alert('🚀 Build otimizado concluído!\n\n• Tamanho reduzido em 15%\n• Performance aumentada\n• Pronto para produção');
+                    }, 1000);
+                } else {
+                    document.getElementById('buildProgress').style.width = progress + '%';
+                    document.getElementById('buildPercent').textContent = Math.floor(progress) + '%';
+                }
+            }, 600);
+        }
+
+        function gerarProGuard() {
+            abrirModal('modalBuild');
+            document.getElementById('buildStatus').textContent = 'Aplicando ofuscação ProGuard...';
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 18;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+
+                    document.getElementById('buildProgress').style.width = '100%';
+                    document.getElementById('buildPercent').textContent = '100%';
+                    document.getElementById('buildStatus').textContent = '✅ ProGuard aplicado com sucesso!';
+
+                    setTimeout(() => {
+                        fecharModal('modalBuild');
+                        alert('🔒 ProGuard configurado!\n\n• Código ofuscado\n• Proteção contra engenharia reversa\n• Otimizações de tamanho aplicadas');
+                    }, 1000);
+                } else {
+                    document.getElementById('buildProgress').style.width = progress + '%';
+                    document.getElementById('buildPercent').textContent = Math.floor(progress) + '%';
+                }
+            }, 500);
+        }
+
+        function testarApp() {
+            abrirModal('modalBuild');
+            document.getElementById('buildStatus').textContent = 'Iniciando emulador e carregando app...';
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+
+                    document.getElementById('buildProgress').style.width = '100%';
+                    document.getElementById('buildPercent').textContent = '100%';
+                    document.getElementById('buildStatus').textContent = '✅ App carregado no emulador!';
+
+                    setTimeout(() => {
+                        fecharModal('modalBuild');
+                        alert('🧪 Teste iniciado!\n\n• Emulador: Android 14\n• Dispositivo: Nexus 5X\n• App carregado e testando...');
+                    }, 1000);
+                } else {
+                    document.getElementById('buildProgress').style.width = progress + '%';
+                    document.getElementById('buildPercent').textContent = Math.floor(progress) + '%';
+                }
+            }, 700);
+        }
+
+        function executarTestes() {
+            abrirModal('modalBuild');
+            document.getElementById('buildStatus').textContent = 'Executando testes unitários...';
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 22;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+
+                    document.getElementById('buildProgress').style.width = '100%';
+                    document.getElementById('buildPercent').textContent = '100%';
+                    document.getElementById('buildStatus').textContent = '✅ Testes concluídos!';
+
+                    setTimeout(() => {
+                        fecharModal('modalBuild');
+                        alert('✅ Resultado dos Testes:\n\n• Total de testes: 45\n• Passou: 43 ✅\n• Falhou: 2 ⚠️\n• Cobertura: 87%');
+                    }, 1000);
+                } else {
+                    document.getElementById('buildProgress').style.width = progress + '%';
+                    document.getElementById('buildPercent').textContent = Math.floor(progress) + '%';
+                }
+            }, 500);
+        }
+
+        function analisarSeguranca() {
+            abrirModal('modalBuild');
+            document.getElementById('buildStatus').textContent = 'Analisando segurança...';
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 16;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+
+                    document.getElementById('buildProgress').style.width = '100%';
+                    document.getElementById('buildPercent').textContent = '100%';
+                    document.getElementById('buildStatus').textContent = '✅ Análise de segurança completa!';
+
+                    setTimeout(() => {
+                        fecharModal('modalBuild');
+                        alert('🔐 Relatório de Segurança:\n\n• Score de Segurança: 9.2/10 ⭐\n• Vulnerabilidades: 0\n• Avisos: 1\n• Status: SEGURO ✅');
+                    }, 1000);
+                } else {
+                    document.getElementById('buildProgress').style.width = progress + '%';
+                    document.getElementById('buildPercent').textContent = Math.floor(progress) + '%';
+                }
+            }, 600);
+        }
+
+        function verificarPerformance() {
+            abrirModal('modalBuild');
+            document.getElementById('buildStatus').textContent = 'Verificando performance...';
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+
+                    document.getElementById('buildProgress').style.width = '100%';
+                    document.getElementById('buildPercent').textContent = '100%';
+                    document.getElementById('buildStatus').textContent = '✅ Análise de performance completa!';
+
+                    setTimeout(() => {
+                        fecharModal('modalBuild');
+                        alert('⚡ Análise de Performance:\n\n• Tempo de inicialização: 1.2s\n• Memória utilizada: 125 MB\n• FPS: 60 (Excelente)\n• Rating: A+ 🌟');
+                    }, 1000);
+                } else {
+                    document.getElementById('buildProgress').style.width = progress + '%';
+                    document.getElementById('buildPercent').textContent = Math.floor(progress) + '%';
+                }
+            }, 500);
+        }
+
+        // ============================================
+        // FUNÇÕES DE CÓDIGO
+        // ============================================
+
+        function verManifestAndroidXml() {
+            const appName = document.getElementById('appName').value || 'MeuApp';
+            const packageName = document.getElementById('packageName').value || 'com.craft.app';
+            
+            const perms = [];
+            if (document.getElementById('perm-internet').checked) perms.push('    <uses-permission android:name="android.permission.INTERNET" />');
+            if (document.getElementById('perm-camera').checked) perms.push('    <uses-permission android:name="android.permission.CAMERA" />');
+            if (document.getElementById('perm-location').checked) perms.push('    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />');
+            if (document.getElementById('perm-storage').checked) perms.push('    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />');
+            if (document.getElementById('perm-contacts').checked) perms.push('    <uses-permission android:name="android.permission.READ_CONTACTS" />');
+
+            const manifest = `<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="${packageName}">
+
+    <!-- Permissões -->
+${perms.length > 0 ? perms.join('\n') : '    <uses-permission android:name="android.permission.INTERNET" />'}
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.${appName}">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>`;
+
+            document.getElementById('codigoTitle').textContent = 'AndroidManifest.xml';
+            document.getElementById('codigoContent').value = manifest;
+            abrirModal('modalCodigo');
+        }
+
+        function verBuildGradle() {
+            const appName = document.getElementById('appName').value || 'app';
+            
+            const gradle = `plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace '${document.getElementById('packageName').value || 'com.craft.app'}'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId '${document.getElementById('packageName').value || 'com.craft.app'}'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "${document.getElementById('appVersion').value || '1.0.0'}"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+dependencies {
+    // AndroidX
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.google.android.material:material:1.9.0'
+
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}`;
+
+            document.getElementById('codigoTitle').textContent = 'build.gradle';
+            document.getElementById('codigoContent').value = gradle;
+            abrirModal('modalCodigo');
+        }
+
+        function verMainActivity() {
+            const appName = document.getElementById('appName').value || 'MeuApp';
+            const packageName = document.getElementById('packageName').value || 'com.craft.app';
+            
+            const activity = `package ${packageName};
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    private TextView welcomeText;
+    private Button mainButton;
+    private Button secondaryButton;
+    private Button optionsButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Inicializar views
+        welcomeText = findViewById(R.id.welcomeText);
+        mainButton = findViewById(R.id.mainButton);
+        secondaryButton = findViewById(R.id.secondaryButton);
+        optionsButton = findViewById(R.id.optionsButton);
+
+        // Definir título
+        welcomeText.setText("${appName}");
+
+        // Configurar listeners dos botões
+        mainButton.setOnClickListener(v -> onMainButtonClick());
+        secondaryButton.setOnClickListener(v -> onSecondaryButtonClick());
+        optionsButton.setOnClickListener(v -> onOptionsButtonClick());
+    }
+
+    private void onMainButtonClick() {
+        Toast.makeText(this, "Botão Principal pressionado!", Toast.LENGTH_SHORT).show();
+        // Adicione sua lógica aqui
+    }
+
+    private void onSecondaryButtonClick() {
+        Toast.makeText(this, "Ação Secundária executada!", Toast.LENGTH_SHORT).show();
+        // Adicione sua lógica aqui
+    }
+
+    private void onOptionsButtonClick() {
+        Toast.makeText(this, "Mais Opções disponíveis", Toast.LENGTH_SHORT).show();
+        // Adicione sua lógica aqui
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Código executado quando a activity retorna para foreground
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Código executado quando a activity entra em background
+    }
+}`;
+
+            document.getElementById('codigoTitle').textContent = 'MainActivity.java';
+            document.getElementById('codigoContent').value = activity;
+            abrirModal('modalCodigo');
+        }
+
+        function copiarCodigo() {
+            const codigo = document.getElementById('codigoContent');
+            codigo.select();
+            document.execCommand('copy');
+            alert('✅ Código copiado para a área de transferência!');
+        }
+
+        function downloadProjeto() {
+            abrirModal('modalBuild');
+            document.getElementById('buildStatus').textContent = 'Preparando projeto para download...';
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 25;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+
+                    document.getElementById('buildProgress').style.width = '100%';
+                    document.getElementById('buildPercent').textContent = '100%';
+                    document.getElementById('buildStatus').textContent = '✅ Projeto pronto!';
+
+                    setTimeout(() => {
+                        fecharModal('modalBuild');
+                        const appName = document.getElementById('appName').value || 'app';
+                        alert(`📥 Download iniciado!\n\nArquivo: ${appName}-projeto-completo.zip\nTamanho: 15.3 MB\n\nO projeto contém:\n✓ Source code completo\n✓ build.gradle\n✓ AndroidManifest.xml\n✓ Recursos e layouts\n✓ Configurações de build`);
+                    }, 1000);
+                } else {
+                    document.getElementById('buildProgress').style.width = progress + '%';
+                    document.getElementById('buildPercent').textContent = Math.floor(progress) + '%';
+                }
+            }, 500);
+        }
+
+        function downloadAPK() {
+            const appName = document.getElementById('appName').value || 'app';
+            alert(`⬇️ Download iniciado!\n\nArquivo: ${appName}-release.apk\nTamanho: ${document.getElementById('appSizeValue').textContent} MB`);
+        }
+
+        // ============================================
+        // FUNÇÕES DE AJUDA
+        // ============================================
+
+        function mostrarAjuda() {
+            abrirModal('modalAjuda');
+        }
+
+        function mostrarSobre() {
+            abrirModal('modalSobre');
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fechar modais ao clicar fora
+            window.addEventListener('click', function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.classList.remove('active');
+                }
+            });
+
+            // Atualizar estatísticas quando permissões mudarem
+            document.querySelectorAll('input[id^="perm-"]').forEach(input => {
+                input.addEventListener('change', atualizarEstatisticas);
+            });
+
+            // Atualizar preview quando inputs mudarem
+            document.getElementById('appName').addEventListener('change', atualizarPreview);
+            document.getElementById('appDesc').addEventListener('change', atualizarPreview);
+            document.getElementById('primaryColor').addEventListener('change', atualizarPreview);
+            document.getElementById('secondaryColor').addEventListener('change', atualizarPreview);
+
+            // Inicializar preview
+            atualizarPreview();
+        });
+
+        // ============================================
+        // CONFIGURAÇÃO JAVA (Para referência)
+        // ============================================
+        
+        /*
+        CONFIG.JAVA - Arquivo de configuração do projeto:
+
+        package com.craft.config;
+
+        public class Config {
+            // URLs e Endpoints
+            public static final String API_BASE_URL = "https://api.exemplo.com";
+            public static final String API_TIMEOUT = "30000";
+
+            // Preferências da Aplicação
+            public static final String APP_VERSION = "1.0.0";
+            public static final String APP_DEBUG = "false";
+
+            // Configurações de Banco de Dados
+            public static final String DB_NAME = "craft_app.db";
+            public static final int DB_VERSION = 1;
+
+            // Configurações de Segurança
+            public static final int MAX_LOGIN_ATTEMPTS = 5;
+            public static final int SESSION_TIMEOUT = 3600;
+
+            // Configurações de UI
+            public static final boolean ENABLE_DARK_MODE = true;
+            public static final String DEFAULT_LANGUAGE = "pt-BR";
+        }
+        */
+    </script>
+</body>
+</html>
